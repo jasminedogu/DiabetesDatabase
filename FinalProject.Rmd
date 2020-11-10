@@ -1,0 +1,39 @@
+---
+title: "Final Project"
+author: "Jasmine Dogu, Brian Wimmer, Lindsey Norberg"
+date: "11/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+df <- read.csv("diabetes.csv")
+head(df)
+```
+
+# Brief Background on Diabetes
+Diabetes is a chronic health condition that inhibits the normal function of the body's insulin production and intake. This results in abnormal breakdown of carbohydrates and elevated levels of glucose within the blood and urine. Diabetes can lead to many complications including blindness, kidney failure, heart attacks, stroke, and lower limb amputation.(World Health Organization)
+
+In the United States alone, there are more than 34 million individuals who have diabetes. More significantly, there are more than 88 million individuals who are pre-diabetic. This disease is the seventh leading cause of death in the United States, and the prevalence of the disease keeps increasing significantly worldwide. Specifically, the number of individuals in low- and middle-income countries is rapidly rising compared to high-income countries. (CDC)
+
+There are two types of diabetes, Type 1 and Type 2. Type 1 is described by "deficient insulin production and requires daily administration of insulin." On the other hand, Type 2 is said to result from "the body’s ineffective use of insulin." Type 2 diabetes is more common within adults or individuals who are overweight or have low physical activity. (CDC)
+
+Understanding the different medical predictors that can lead to diabetes can help individuals educate themselves to take the precautions necessary to avoid becoming pre-diabetic or diabetic. This is especially important for those who may become victim to Type 2 Diabetes in their lifetime. This analysis will look for some of those medical predictors to see their significance with the outcome of diabetes.
+
+# About the Prima Indians Diabetes Dataset
+Before selecting a machine learning algorithm, having a clear understanding of the data is critical.
+We must familiarize ourselves with the origin, size, key characteristics, behavior, and type of data.
+
+The selected dataset for this project is original from the National Institute of Diabetes and Digestive and Kidney Diseases but can also be found on Kaggle  [here](https://www.kaggle.com/uciml/pima-indians-diabetes-database). 
+
+The dataset is composed of eight medical predictor variables and one target variable, Outcome. The medical predictor variables include number of pregnancies, blood pressure, BMI, insulin levels, age, skin thickness, diabetes pedigree, and age. 
+
+[add something about how these variables may play a role in diabetes.] maybe
+
+
+# References
+https://www.who.int/news-room/fact-sheets/detail/diabetes
+https://www.cdc.gov/diabetes/basics/quick-facts.html
