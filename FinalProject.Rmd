@@ -1,6 +1,6 @@
 ---
 title: "Final Project"
-author: "Jasmine Dogu, Brian Wimmer, Lindsey Norberg- Group 3"
+author: "Jasmine Dogu, Brian Wimmer, Lindsey Norberg - Group 3"
 date: "11/10/2020"
 output:
   html_document:
@@ -11,7 +11,17 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+set.seed(40014001)
 library(yaml)
+library(class)
+library(plotly)
+library(e1071) 
+library(caret)
+library(caTools) 
+library(knitr)
+library(dplyr)
+library(formattable)
+library(plyr)
 ```
 
 # Purpose of this Project
@@ -20,18 +30,18 @@ library(yaml)
 This project aims to discover a machine learning algorithm discussed within our Data Science 4001 class. Through the completion of this project, the goal is to obtain a detailed knowledge of one of the topics as well as tell an important story of the results. Although the analysis itself is essential, the ability to interpret the results efficiently and successfully is vital. The aim through this project is to successfully create two Machine Learning models and effectively tell an un-biased 'story' or conclusion with our findings.
 
 # Brief Background on Diabetes
-Diabetes is a chronic health condition that inhibits the normal function of the body's insulin production and intake. This results in abnormal breakdown of carbohydrates and elevated levels of glucose within the blood and urine. Diabetes can lead to many complications including blindness, kidney failure, heart attacks, stroke, and lower limb amputation.(World Health Organization)
+Diabetes is a chronic health condition that inhibits the normal function of the body's insulin production and intake. This results in abnormal breakdown of carbohydrates and elevated levels of glucose within the blood and urine. Diabetes can lead to many complications including blindness, kidney failure, heart attacks, stroke, and lower limb amputation (World Health Organization).
 
-In the United States alone, there are more than 34 million individuals who have diabetes. More significantly, there are more than 88 million individuals who are pre-diabetic. This disease is the seventh leading cause of death in the United States, and the prevalence of the disease keeps increasing significantly worldwide. Specifically, the number of individuals in low- and middle-income countries is rapidly rising compared to high-income countries. (CDC)
+In the United States alone, there are more than 34 million individuals who have diabetes. More significantly, there are more than 88 million individuals who are pre-diabetic. This disease is the seventh leading cause of death in the United States, and the prevalence of the disease keeps increasing significantly worldwide. Specifically, the number of individuals in low- and middle-income countries is rapidly rising compared to high-income countries (CDC).
 
-There are two types of diabetes, Type 1 and Type 2. Type 1 is described by "deficient insulin production and requires daily administration of insulin." On the other hand, Type 2 is said to result from "the body’s ineffective use of insulin." Type 2 diabetes is more common within adults or individuals who are overweight or have low physical activity. (CDC)
+There are two types of diabetes, Type 1 and Type 2. Type 1 is described by "deficient insulin production and requires daily administration of insulin." On the other hand, Type 2 is said to result from "the body’s ineffective use of insulin." Type 2 diabetes is more common within adults or individuals who are overweight or have low physical activity (CDC).
 
 Understanding the different medical predictors that can lead to diabetes can help individuals educate themselves to take the precautions necessary to avoid becoming pre-diabetic or diabetic. This is especially important for those who may become victim to Type 2 Diabetes in their lifetime. This analysis will look for some of those medical predictors to see their significance with the outcome of diabetes.
 
-# About Pima Indians
-There have been a plethora of studies analyzing Type 2 Diabetes; however, because the disease is so multi-faceted, researchers have been using specific approaches to reduce the "complexity" of the disease by studying a population that has limited genetic and environmental variability (Reference 3). A population that fits this description is the Pima Indians of Arizona; another factor that is useful of this population is that they are said to have the "highest reported prevalence of diabetes [specifically Type 2 Diabetes] of any population in the world" (Reference 3). There have been multiple genetic studies conducted to identify susceptibility genes in Pima Indians.  
+# About Pima Native Americans
+There have been a plethora of studies analyzing Type 2 Diabetes; however, because the disease is so multi-faceted, researchers have been using specific approaches to reduce the "complexity" of the disease by studying a population that has limited genetic and environmental variability (Reference 3). A population that fits this description is the Pima Native Americans of Arizona; another factor that is useful of this population is that they are said to have the "highest reported prevalence of diabetes [specifically Type 2 Diabetes] of any population in the world" (Reference 3). There have been multiple genetic studies conducted to identify susceptibility genes in Pima Native Americans.  
 
-Although the dataset we are utilizing does not claim that the patients only have Type 2 Diabetes and that the Pima Indian group was selected due to genetic and environmental advantages, it can be assumed that this is likely the case. By analyzing a sample of a population that has limited genetic and environmental variability (as well as a restriction on age), our results are more specific to the factors that lead to diabetes that are not related to other health concerns. It is, therefore, imperative to look at our results from a perspective that acknowledges this claim. The more knowledgeable one is about the dataset and where it comes from, the better and less biased the analysis/results will be.
+Although the dataset we are utilizing does not claim that the patients only have Type 2 Diabetes and that the Pima Native American group was selected due to genetic and environmental advantages, it can be assumed that this is likely the case. By analyzing a sample of a population that has limited genetic and environmental variability (as well as a restriction on age), our results are more specific to the factors that lead to diabetes that are not related to other health concerns. It is, therefore, imperative to look at our results from a perspective that acknowledges this claim. The more knowledgeable one is about the dataset and where it comes from, the better and less biased the analysis/results will be.
 
 # About the Dataset
 
@@ -39,30 +49,119 @@ Although the dataset we are utilizing does not claim that the patients only have
 df <- read.csv("diabetes.csv")
 nrow(df)
 ```
+
 Before selecting a machine learning algorithm, having a clear understanding of the data is critical. We must familiarize ourselves with the origin, size, key characteristics, behavior, and type of data. 
 
-The selected dataset for this project is original from the National Institute of Diabetes and Digestive and Kidney Diseases but can also be found on Kaggle  [here](https://www.kaggle.com/uciml/pima-indians-diabetes-database). 
+The selected dataset for this project is original from the National Institute of Diabetes and Digestive and Kidney Diseases but can also be found on Kaggle  [here](https://www.kaggle.com/uciml/pima-Native Americans-diabetes-database). 
 
-The dataset is composed of eight medical predictor variables and one target variable, Outcome. The medical predictor variables include number of pregnancies, blood pressure, BMI, insulin levels, age, skin thickness, diabetes pedigree, and age. There are 768 observations or patients (in this case). All of these observations are for women ages 21 and up of Pima Indian heritage. Therefore, gender will not be a variable considered for this analysis. Because several constraints were placed on the selection of these patients, the data being analyzed is considered a sample; if it had been representative of all of the Pima Indians, then it would have been considered a population.
+The dataset is composed of eight medical predictor variables and one target variable, Outcome. The medical predictor variables include **number of pregnancies, blood pressure, BMI, insulin levels, age, skin thickness, diabetes pedigree, and age.** There are **768 observations or patients** (in this case). All of these observations are for women ages 21 and up of Pima Native American heritage. Therefore, gender will not be a variable considered for this analysis. Because several constraints were placed on the selection of these patients, the data being analyzed is considered a sample; if it had been representative of all of the Pima Native Americans, then it would have been considered a population.
 
 # Data Cleaning
-```{r}
+```{r, echo = FALSE}
 str(df)
+```
+
+```{r}
 df$Outcome <- factor(df$Outcome) #change Outcome to a factor with levels 0 and 1
 summary(df)
 ```
-Looking at the structure of the dataframe, the Outcome column is seen as an integer value; this must be modified to be levels of 0 representing "tested negative for diabetes" and 1 representing "tested positive for diabetes."
+
+Looking at the structure of the data frame, the Outcome column is seen as an integer value; this must be modified to be levels of 0 representing "tested negative for diabetes" and 1 representing "tested positive for diabetes."
 
 ```{r}
 df[, 3:7][df[, 3:7] == 0] <- NA #assign column's with 0's a value of NA
 df<- na.omit(df)    #remove NA's           
 ```
-Looking at the structure of the data, the data appears to have no NA's present. However, there are certain medical predictor variables with values equal to 0. For example, Blood Pressure, Skin Thickness, BMI, and Insulin should realistically not ever be 0. Therefore, it can be assumed that these biological measurements must be removed as they are not meaningful.
+
+Looking at the structure of the data, the data appears to have no NA's present. However, there are certain medical predictor variables with values equal to 0. For example, **Blood Pressure, Skin Thickness, BMI, and Insulin** should realistically not ever be 0. Therefore, it can be assumed that these biological measurements must be removed as they are not meaningful
+
 
 ```{r}
-nrow(df) #checking size of the new df
+nm.rows <- data.frame("Number of Rows" = nrow(df))
+kable(nm.rows)
 ```
-With these modifications, the dataset is restricted to 393 observations/patients. Understanding the size and structure of the dataset allows for the best selection of the Machine Learning Algorithm that will be implemented.
+
+With these modifications, the dataset is restricted to **393 observations/patients**. Understanding the size and structure of the dataset allows for the best selection of the Machine Learning Algorithm that will be implemented.
+
+# Exploratory Data Analysis
+Prior to choosing our machine learning algorithms and continuing on with our project, we wanted to do some exploratory data analysis to achieve an even better understanding of diabetes and the Pima Native Americans. We used the "plotly" package for data visualization. More about the package and specific use can be found [here](https://plotly.com/r/)
+
+```{r, warning = FALSE, message = FALSE}
+df.new <- df %>% mutate(age_factor = case_when(
+                    Age >= 20 & Age <= 29 ~ '20-29',
+                    29 < Age & Age <= 39 ~ '30-39',
+                    39 < Age & Age <= 49 ~ '40-49',
+                    49 < Age & Age <= 59 ~ '50-59',
+                    59 < Age ~ '60 +'))
+
+colors<- c("#A569BD", "#EC7063", "#16A085", "#F1C40F", "#95A5A6")
+
+
+fig <- plot_ly(df.new, labels = ~age_factor, values = ~as.numeric(as.factor(age_factor)), type = 'pie',
+        textposition = 'inside',
+        textinfo = 'label+percent',
+        insidetextfont = list(color = '#FFFFFF'),
+        hoverinfo = 'text',
+        text = ~paste( age_factor, ' years'),
+        marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 1)),
+                      #The 'pull' attribute can also be used to create space between the sectors
+        showlegend = FALSE)
+
+fig <- fig %>% layout(title = 'Ages of Patients',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+fig
+
+```
+We did a pie chart of the age of the women in the dataset to better understand how many young women were represented in the dataset in compared to older women. The pie chart shows an overwhelming majority of younger women, with the most represented age group being 21-29 (making up 36.3%). One thing to note is that as the age group increases in age, its proportion of the entire data set decreases. In the next step, we want to compare this to those that tested positive to see if we find a similar trend, or just another trend in general relating diabetes diagnoses to age. 
+
+```{r, message = FALSE, warning = FALSE}
+w.diabetes <- (1:nrow(df.new))[df.new[ ,"Outcome"] == 1]
+w.diabetes2 <- df.new[w.diabetes, ]
+
+
+colors<- c( "#EC7063","#A569BD", "#F1C40F","#16A085", "#95A5A6")
+
+fig3 <- plot_ly(w.diabetes2, labels = ~age_factor, values = ~as.numeric(as.factor(age_factor)), type = 'pie',
+        textposition = 'inside',
+        textinfo = 'label+percent',
+        insidetextfont = list(color = '#FFFFFF'),
+        hoverinfo = 'text',
+        text = ~paste( age_factor, ' years'),
+        marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 1)),
+                      #The 'pull' attribute can also be used to create space between the sectors
+        showlegend = FALSE)
+
+fig3 <- fig3 %>% layout(title = 'Ages of Patients',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+fig3
+```
+
+Looking at this age break down, we find that ages 50-59 have the largest representation proportionally of those women who were diagnosed with diabetes. Followed by ages 40-49, 30-39, 20-20, and 60+ still as the least represented. This trend is almost the complete converse to our initial findings, indicating that of those that have diabetes, the 50-59 age group is represented more proportionally. Thus, this should be an indicator that age may play a role in diabetes prevalence. 
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(df, aes(x = Outcome, y = BMI, fill = Outcome)) + geom_boxplot() + labs(title = "Distribution of Diabetes by BMI")
+ggplot(df, aes(x = Outcome, y = Age, fill = Outcome)) + geom_boxplot() + labs(title = "Distribution of Dibabetes by Age")
+ggplot(df, aes(x = Outcome, y = BloodPressure, fill = Outcome)) + geom_boxplot() + 
+  labs(title = "Distribution of Diabetes by Blood Pressure")
+```
+
+In addition, for our EDA, we decided to analyze some of the preliminary relationships in our dataset using boxplots. With the useage of boxplots, we were hoping to see if there was a difference in the distribution of some of our quantitative variables between those that have diabetes and those that do not. If we see that the they largely overlap, they may not be as important in driving our classification efforts; however, if we notice a non-trivial difference in the distributions, this may be an indication that the variable is one that is important in differentiating between those that have diabetes and those that do not. For this portion of EDA, we decided to look at BMI, Age, and Blood Pressure levels. From the three plots, we find that the distrubtion of BMI and Blood Pressure have relatively similar distributions between those with diabetes and those do not, with a slightly higher distribution, however, for those with diabetes. Thus, these variables may not be as important in our classification efforts as we had anticipated. Looking at age, however, similar to our findings from the previous EDA, we find that the distribution of Age for those with diabetes lies more notably above the Age of those without diabetes. Although this is not a drastic disparity in distribution, it is more noticeable than the other two plots, and also is consistent with our findings from the previous EDA procedure. This means that Age is a variable worth noting and continuing to explore in our future analysis. 
+
+When conducting our classification procedure, it is also imperative to ensure that we have a relatively balanced data set. To do this, we will check the base rate in addition to ensure that there are not any serious threats to the balance between either class. 
+
+```{r}
+tbl <- table(df$Outcome)
+baserate <- tbl[2] / sum(tbl)
+paste0("The base rate is: ", round(baserate, 6) * 100, "%")
+```
+
+With a base rate of 33.08%, although this is not a perfect 50/50 split that we would prefer in an ideal world, this certainly does not raise any serious red flags about sample imbalance. Thus, we can proceed, but still should consider that our data on those with diabetes, which are coded as 1's within the data, are less represented within the data set relative to those that do not have diabetes, which are coded as 0's.
 
 ![Choosing an Algorithm (Reference Five)](ML_algo.png)
 
@@ -113,8 +212,6 @@ The 'Outcome' column is already a class of type 'factor', therefore we do not ne
 #install.packages('caTools') 
 library(caTools) 
   
-set.seed(03092000)
-
 # Creating a 70/30 split
 splitting_data <- sample(1:nrow(df),
                round(0.7 * nrow(df), 0), 
@@ -171,15 +268,72 @@ library(caret)
 cm <- confusionMatrix(svm_test$Outcome,y_pred, positive = "1")
 cm
 ```
-After creating our confusion matrix, we can see that our **accuracy** for the model is **76.27%**, which means that the model is performing moderately well. We can then look at the **specificity** value of **62.86%**, which tells us the true negative rate. This means that our model identifies patients without diabetes correctly 62.86% of the time. Similarly, we can look at the **sensitivity** value of **81.93%**, which tells us the true positive rate. This means that we identify patients with diabetes correctly 81.93% of the time.Specificity and sensitivity are important in our analysis as they are values that we care about optimizing. The higher both of these values are, the better our model is at predicting patients who are diabetic and those who are not. 
 
-[ add perhaps more text here explaining significance, is our p value a bad indication (text me about this)]
+After creating our confusion matrix, we can see that our **accuracy** for the model is **76.27%**, which means that the model is performing moderately. We can then look at the **specificity** value of **78.65%**, which tells us the true negative rate. This means that our model identifies patients without diabetes correctly 78.65% of the time. Similarly, we can look at the **sensitivity** value of **68.97%**, which tells us the true positive rate. This means that we identify patients with diabetes correctly 68.97% of the time.Specificity and sensitivity are important in our analysis as they are values that we care about optimizing. The higher both of these values are, the better our model is at predicting patients who are diabetic and those who are not. 
 
-## SVM Conclusion
+## Parameter Tuning 
+
+Similar to other models, we would consider optimizing our model by finding our optimal hyper-parameter. For the SVM model, we will consider our **gamma value** and the **cost value.** For the gamma value, this number defines how far the influence of a single training example reaches. The higher the gamma value, points that are closer to the decision boundary will carry more weight than those farther away from the decision boundary, and thus the decision boundary becomes more flexible / non-linear. Conversely, smaller gamma values place more weight on points farther away from the decision boundary, giving a more linear decision boundary. Our C value, or cost, controls the tradeoff between classification of training points and a smooth decision boundary. As we increase C, the model uses more points as a part of the support vector which lowers the bias of the model at the expense of increased variance. If we inflate C too much, we run the risk of overfitting the model. 
+
+
+![Very Large Cost Value](verylargc.png) ![Very Small Cost Value](verysmallc.png)
+
+
+We can now use a tuning function to tune our SVM function and run a new and, hopefully, improved model. 
+
+## Tuning Gamma and Cost 
+
 ```{r}
-
+## Optimizing Gamma and Cost Parameters
+library(e1071)
+obj <- tune(svm, Outcome~., data = svm_test, 
+            ranges = list(gamma = 2^(-1:1), 
+                          cost = 2^(2:4)),
+            tunecontrol = tune.control(sampling = "fix"))
+summary(obj)
+plot(obj)
 ```
 
+From the given output, we will choose to use a gamma value of 2, and a cost value of 4. We will now rerun our model and compare its performance to the original model with the default gamma and cost values. 
+
+## Creating the Tuned Model
+
+```{r}
+tuned.svm <- svm(formula = Outcome ~ ., 
+                 data = svm_train, 
+                 type = 'C-classification',  #Default
+                 kernel = 'linear',
+                 gamma = 2,
+                 cost = 4) 
+summary(tuned.svm)
+```
+
+
+## Creating New Confusion Matrix
+
+```{r}
+# Predicting the test set results
+y_pred.tune <- predict(tuned.svm, newdata = svm_test[-9]) 
+
+# Making a Confusion Matrix 
+#install.packages("caret")
+library(caret)
+cm.tune <- confusionMatrix(svm_test$Outcome,
+                           y_pred.tune, 
+                           positive = "1")
+cm.tune
+```
+
+After optimizing our model, we can see that we have the same accuracy, specificity, and sensitivity rates. Although this is not desired, there are multiple ways to avoid this in the future. Some of these include dealing with missing data and outliers so that more data is present. Furthermore, feature engineering and feature selection can be critical options as well. Although there are many ways to optimize the SVM model, another option is to select an algorithm that works better for the given dataset. As a result, we will be moving onto the KNN model. 
+
+Although our model's specificity and sensitivity rates remained the same, in the context of the problem, it is beneficial to ensure that both of these class prediction rates are being optimized; however, we should especially focus on the specificity. For those that do have diabetes, it is imperative that they receive necessary and proper medical attention, and misclassifying them as non-diabetic could pose as a serious threat to one's health. Falsely classifying someone as diabetic also would not be desired, but would serve as less of a threat to one's health than a false negative. 
+
+
+## SVM Conclusion
+
+Originally, the SVM model performed with **76.27%** accuracy, which remained the same after the model tuning. Specificity and sensitivity also remained the same at a value of **78.65%** and **68.97%**, respectively. In order for this model to perform better, there must be a higher sensitivity and specificity rate, which would in turn help increase the accuracy. 
+
+Therefore we should, and will, consider other methods to see if other models better fit the needs of our scenario. Thus, we will now consider the K Nearest Neighbors classification method. 
 
 # High Level Description of KNN
 
@@ -216,7 +370,6 @@ diab <- split[2] / sum(split) #1 represents diabetic (positive for diabetes)
 data.frame(c('Diabetic' = diab,'Not Diabetic' = non_diab))
 ```
 Looking at the base rates, we can see that about **33.1%** of our dataset is made up of patients who are **diabetic** and **66.9%** of our dataset is made up of patients who are **not diabetic**.
-[ do we need more here????]
 
 
 ## Checking Correlations
@@ -239,8 +392,6 @@ In order to analyze the correlation values, we can create a heatmap to get a vis
 ## Removing High Correlations
 ```{r}
 #Removing variables with high correlations (.7 or higher, -.7 or lower) 
-library(dplyr)
-library(formattable)
 
 correlations %>%        # start with the correlation matrix (from earlier step)
   as.table() %>% as.data.frame() %>%       
@@ -263,8 +414,6 @@ We do not need to subset the dataframe based on the above analysis; therefore, w
 #install.packages('caTools') 
 library(caTools) 
   
-set.seed(03092000)
-
 # Creating a 70/30 split
 splitting_data2 <- sample(1:nrow(df),
                round(0.7 * nrow(df), 0), 
@@ -297,7 +446,6 @@ As with the SVM mode, scaling is of paramount importance since the scales used f
 
 ## Fitting KNN to the Training Set 
 ```{r}
-library(class)
 diab_test_pred_knn <- knn(train = knn_train, 
                       test = knn_test,
                       cl = knn_train[, "Outcome"], #<- category for true classification
@@ -307,7 +455,7 @@ diab_test_pred_knn <- knn(train = knn_train,
 # View the output
 table(diab_test_pred_knn)
 ```
-Here, we can see that our model determined 154 "Not Diabetic/Negative" groupings and 76 "Diabetic/Positive" groupings.
+Here, we can see that our model determined **83 "Not Diabetic/Negative"** groupings and **35 "Diabetic/Positive"** groupings.
 
 There are multiple factors to look at when selecting an initial k value. Ideally, the value for k will be an odd integer as it avoids the problem of breaking ties in a binary classifier. In this situation, we decided on an initial k by taking the square root of the number of features. Since this dataset contains nine features, our k value is 3. Since 3 is an odd integer, this is a good starting point for our analysis.
 
@@ -323,15 +471,14 @@ The graphic above shows the importance of selecting a k that is appropriate for 
 #Creating a confusion matrix and getting detailed information about other metrics
 confusionMatrix(as.factor(diab_test_pred_knn), as.factor(knn_test$Outcome), positive = "1", dnn=c("Prediction", "Actual"), mode = "sens_spec")
 ```
-With the confusion matrix created, we can see that our model has **143 true negatives** and **65 true positives**. In plain terms, this means that 143 patients were correctly identified as not having diabetes, and 65 patients were correctly identified as having diabetes.
+With the confusion matrix created, we can see that our model has **74 true negatives** and **29 true positives**. In plain terms, this means that 74 patients were correctly identified as not having diabetes, and 29 patients were correctly identified as having diabetes.
 
-The **accuracy rate** is about **90.43%**. Compared to the **base rate of 65/35**, this accuracy rate is performing **very well**. However, we can continue looking at other metrics to get a better sense of the model. We have a **sensitivity rate** of **85.53%**. This is the true positive rate, meaning that 85.53% of non-diabetic patients were correctly identified as non-diabetic. Similarly, we have a **specificity rate** of **92.86%**. This is the true negative rate, meaning that 92.86% of diabetic patients were correctly identified as diabetic. As we can see here, ideally we would want to increase our sensitivity rate and specificity rate; however, since sensitivity is significantly lower than specificity at a k of 3, increasing our true positive rate is critical in optimizing our model. Although overall, the metrics prove that this is not poor performance, we certainly can do better. To do this, **we can find our optimal value of k which will maximize our overall accuracy**. 
+The **accuracy rate** is about **87.29%**. Compared to the **base rate of 65/35**, this accuracy rate is performing **well**. However, we can continue looking at other metrics to get a better sense of the model. We have a **sensitivity rate** of **76.32%**. This is the true positive rate, meaning that 76.32% of non-diabetic patients were correctly identified as non-diabetic. Similarly, we have a **specificity rate** of **92.50**. This is the true negative rate, meaning that 92.50% of diabetic patients were correctly identified as diabetic. As we can see here, ideally we would want to increase our sensitivity rate and specificity rate; however, since sensitivity is significantly lower than specificity at a k of 3, increasing our true positive rate is critical in optimizing our model. Although overall, the metrics prove that this is not poor performance, we certainly can do better. To do this, **we can find our optimal value of k which will maximize our overall accuracy**. 
 
 ## Running the chooseK Function
 ```{r}
 #15 Run the "chooseK" function to find the perfect K, while using sapply() function on chooseK() to test k from 1 to 21 (only selecting the odd numbers), and set the train_set argument to 'commercial_train', val_set to 'commercial_test', train_class to the "label"   column of 'commercial_train', and val_class to the "label" column of 'commercial_test'. Label this  "knn_diff_k_com"
 chooseK = function(k, train_set, val_set, train_class, val_class){
-  set.seed(03092000)
   class_knn = knn(train = train_set,    
                   test = val_set,       
                   cl = train_class,     
@@ -359,7 +506,7 @@ Here, we are creating a chooseK function which we will use to test different k v
 new_k <- data.frame(k_value = new_k[1, ], accuracy = new_k[2, ])
 new_k
 ```
-Here, we are creating an easier, more visually appealing way to view the results of the step prior. We can see that the accuracy is at it's **peak** around a **k value** of **5, 7, and 9**. In fact, these **k values** are all the same **.9130435**. This goes to show that our initial k value of 3 did not yield the most accurate model. Therefore, we should change our model so that it utilizes a k value that is 5, 7, or 9.
+Here, we are creating an easier, more visually appealing way to view the results of the step prior. We can see that a k value of 1 gives us the highest accuracy rate; however, in the context of the model, a k level of 1 does not make sense as it would imply overfitting to the data. The second highest peak of the accuracy rate is at a **k value** of **7**. At a k of 7, we have an accuracy of **88.98%**. This goes to show that our initial k value of 3 did not yield the most accurate model. Therefore, we should change our model so that it utilizes a k value of 7.
 
 
 ## Ggplot to Show Output
@@ -374,22 +521,24 @@ ggplot(new_k, aes(x = k_value, y = accuracy)) +
        y= "Model Accuracy")
   
 ```
-The graph above is a visual representation of the chart we had displayed earlier; this contains the same information. Again, it is seen that the most optimal value for k can be found in the 5-10 range. A k value of 5, 7, or 9 would be preferred here. We would want to continue keeping our k value a positive, odd integer (thereby not selecting integers like 6, 8, 10). After a k value of 10, we find that increases in our k value exhibit diminishing marginal returns. As a result, to avoid overfitting while maintaining adequate accuracy, we can thus use k = 5 as our optimal k value to proceed with our analysis.
+The graph above is a visual representation of the chart we had displayed earlier; this contains the same information. Again, it is seen that the most optimal value for k can be found around 7. We would want to continue keeping our k value a positive, odd integer. As a result, to avoid overfitting while maintaining adequate accuracy, we can thus use k = 7 as our optimal k value to proceed with our analysis.
 
 ## Rerunning the Model with Optimal K
 ```{r}
 # Rerun the model  with "optimal" k 
-library(class)
 updated_diab_knn <- knn(train = knn_train, 
                       test = knn_test,
                       cl = knn_train[, "Outcome"], #<- category for true classification
-                      k=5,
+                      k=7,
                       use.all = TRUE) #<- control ties between class assignments If true, all distances equal to the kth largest are included
 
 # View the output
 table(updated_diab_knn)
 ```
-As mentioned in the prior step, a k value of 5 was selected as the optimal k value for this model. In fact, although it is not shown here, **k levels of 5, 7 and 9 all resulted in the same accuracy rate**. On the other hand, **k levels of 6, 8, and 10 ** were **not all equal** but were **all 1-2% lower** in the **accuracy rate** when compared to the k levels of 5, 7, and 9. This, again, reiterates the importance of selecting a positive, odd k value that is optimal for the given dataset. In the next step, the specifics for the model with k=5 is shown.
+As mentioned in the prior step, a k value of 7 was selected as the optimal k value for this model. Here, we can see that our model determined **85 "Not Diabetic/Negative"** groupings and **33 "Diabetic/Positive"** groupings.
+
+
+In the next step, the specifics for the model with k=7 is shown.
 
 ## Confusion Matrix
 ```{r}
@@ -397,34 +546,31 @@ As mentioned in the prior step, a k value of 5 was selected as the optimal k val
 confusionMatrix(as.factor(updated_diab_knn), as.factor(knn_test$Outcome), positive = "1", dnn=c("Prediction", "Actual"), mode = "sens_spec")
 ```
 
-With the confusion matrix created, we can see that our model has **144 true negatives** and **65 true positives**. In plain terms, this means that 144 patients were correctly identified as not having diabetes, and 65 patients were correctly identified as having diabetes.
+With the confusion matrix created, we can see that our model has **76 true negatives** and **29 true positives**. In plain terms, this means that 76 patients were correctly identified as not having diabetes, and 29 patients were correctly identified as having diabetes.
 
-The **accuracy rate** is **91.3%**, which means that this accuracy rate is performing **very well**. As with our previous analysis, we can continue looking at other metrics to get a wider sense of the model. We have a **sensitivity rate** of **86.84%**. This is the true positive rate, meaning that 86.84% of non-diabetic patients were correctly identified as non-diabetic. Similarly, we have a **specificity rate** of **93.51%**. This is the true negative rate, meaning that 93.51% of diabetic patients were correctly identified as diabetic. 
+The **accuracy rate** is **88.98%**, which means that this accuracy rate is performing **fairly well**. As with our previous analysis, we can continue looking at other metrics to get a wider sense of the model. We have a **sensitivity rate** of **76.32%**. This is the true positive rate, meaning that 76.32% of non-diabetic patients were correctly identified as non-diabetic. Similarly, we have a **specificity rate** of **95%**. This is the true negative rate, meaning that 95% of diabetic patients were correctly identified as diabetic. 
 
 ## Comparing the Different KNN Models
 ```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
 tabl <- "  # Comparing Models with Different K Values
-| Metric        | k= 3     | k = 5 |
+| Metric        | k= 3     | k = 7 |
 |---------------|:--------:|------:|
-| Accuracy      | 90.43%   |91.30% |
-| Specificity   | 92.86%   |93.51% |
-| Sensitivity   | 85.53%   |86.84% |
+| Accuracy      | 87.29%   |88.98% |
+| Specificity   | 92.50%   |95.00% |
+| Sensitivity   | 76.32%   |76.32% |
 "
 cat(tabl) # output the table in a format good for HTML/PDF/docx conversion
 ```
 
-As we can see displayed above, every metric (accuracy, specificity, and sensitivity) went up by a decent amount when using a k of 5. Our model is performing better than it was originally with a k of 3, which is the desired outcome. Although we did not run into this issue with our model, there may be situations where in order to increase the accuracy of the model, there is a trade-off between the specificity and sensitivity rates. For example, at a high accuracy rate, there may be times when specificity goes down and sensitivity goes up, or vice versa. In situations like this, it is critical for the data scientist to determine which metric is more important. 
+As we can see displayed above, accuracy and specificity went up by a decent amount when using a k of 7. Sensitivity remained the same at 76.32%. In future models, the aim may be to increase the rate of sensitivity since a rate of 76.32% can be viewed as poor to moderate, especially when compared to the other metrics. However, generally, we are content with the increase in accuracy and specificity as that was the goal of the optimization with a k value of 7.
+
+Although we did not run into this issue with our model, there may be situations where in order to increase the accuracy of the model, there is a trade-off between the specificity and sensitivity rates. For example, at a high accuracy rate, there may be times when specificity goes down and sensitivity goes up, or vice versa. In situations like this, it is critical for the data scientist to determine which metric is more important. 
 
 ## KNN Conclusion
-As mentioned before, our model was at its optimal performance when a k value of 5 was utilized. This allowed for the accuracy, specificity, and sensitivity to be at its highest. Our accuracy level was 91.30% and specificity was 93.51%, both of which are relatively high. Compared to the other two metrics, sensitivity was lower at a rate of 86.84%; even though sensitivity is not 'low' in this case, it could be improved upon in future analysis. 
+As mentioned before, our model was at its optimal performance when a k value of 7 was utilized. This allowed for the accuracy and specificity to be at its highest. Our accuracy level was 88.98% and specificity was 95%, both of which are relatively high. Compared to the other two metrics, sensitivity was lower at a rate of 76.32%; even though sensitivity is not 'low' in this case, it could be improved upon in future analysis. 
 
 A way to improve our KNN model could be to collect more data. Although we had a several hundred observations to work with in the dataset, having access to significantly larger amounts of observations will allow for the model to adjust accordingly; this could result in a higher accuracy, specificity, and sensitivity rate. 
 
-
-# Overall Conclusion
-[include which model performed better (SVM or KNN and how do we know)]
-this is gonna be about our analysis
-Cant write this untill we know our svm results 
 
 # SVM vs KNN 
 
@@ -436,22 +582,28 @@ There are also certain circumstances when SVM can be preferred over KNN. Typical
 
 At the end of the day, the selection of an algorithm is entirely dependent on the data scientist and the dataset that is selected. There can be multiple advantages and disadvantages of using different algorithms. Having a clear understanding of each algorithm is crucial for this reason. 
 
+# Overall Conclusion
+Overall, out of both the SVM and KNN models, in terms of accuracy, specificity, and sensitivity, as well as other metrics not discussed in the analysis but given as a guide, **the KNN model out-performed the SVM model.** In fact, the KNN model had an accuracy of **88.98%** after using an optimized k value whereas the SVM model only had an accuracy rate of **76.27%** even after the parameter tuning. This was also true for the specificity and sensitivity values. Both of these metrics were significantly higher in the KNN model, which can be explained as a cause for the KNN model's high accuracy rate. The reason for this lies in the **topology of the distribution of the class data.** Meaning, this could be **indication that the dataset is not easily separable using the decision planes that we have let SVM use.** 
+
+The basic SVM model, which is what we utilized in our analysis, uses **linear hyperplanes** to separate the classes. On the other hand, the KNN model can **generate a highly convoluted decision boundary** since it is driven by the raw training data itself. Since the KNN model provided good results, it signifies that the classes, whether a patient is diabetic or not, are easily separable by the training data. A future implementation of a dataset of similar data points should utilize a **scatter plot in the EDA** to try different transforms of the input data; by having a visual of the data points, it can make it easier to see if the classes are linearly separable. In addition, if there exists a set of transforms that make the classes more linearly separable, then linear (or close to linear) classification techniques, like the basic SVM model we used, will function better. These transforms can include but are not limited to taking each metric to a power or taking logs of the metrics. 
+
+
 # Limitations of Analysis/Dataset
-One limitation of the dataset, to reiterate, is the restrictions set on the dataset. Specifically, the patients included were all females that were 21+ and of Pima Indian heritage. Initially, this provided our group with 768 observations (in this case, patients); however, after looking at the data, it was clear that there were meaningless 0's within the dataset. Once these were removed, our group was left with 393 observations/patients. Although 393 rows is not a significantly small sample to analyze, most machine learning algorithms function better with more data points. Having more observations could help significantly increase the accuracy rate within our models and make the models more robust to new incoming data.
+One limitation of the dataset, to reiterate, is the restrictions set on the dataset. Specifically, the patients included were all **females** that were **21+** and of **Pima Native American heritage**. Initially, this provided our group with **768 observations** (in this case, patients); however, after looking at the data, it was clear that there were **meaningless 0's** within the dataset. Once these were removed, our group was left with **393 observations/patients**. Although 393 rows is not a significantly small sample to analyze, **most machine learning algorithms function better with more data points.** Having more observations could help significantly increase the accuracy rate within our models and make the models more robust to new incoming data.
 
 # Further Analysis
-As mentioned before, a reason to why this study was restricted to individuals of Pima Indian heritage could be because of the different genetic advantages that make analyzing the cause of diabetes within the sample much simpler. However, there are a plethora of ways to continue analyzing this disease. Although there are more than three different approaches possible, our group has highlighted the three we believe make the most sense in terms of next steps. 
+As mentioned before, a reason to why this study was restricted to individuals of Pima Native American heritage could be because of the different **genetic advantages** that make analyzing the cause of diabetes within the sample much simpler. However, there are a plethora of ways to continue analyzing this disease. Although there are more than three different approaches possible, our group has highlighted the three we believe make the most sense in terms of next steps. 
 
 ## Approach 1
-Depending on whether the data scientist is interested in understanding Type 1 or Type 2 Diabetes, the dataset could be more detailed and contain whether a patient has Type 1 Diabetes or Type 2 Diabetes, which our dataset did not signify. This could be extremely important in determining factors that may be significant for one type of diabetes but not the other; it can allow the data scientists to conclude similarities and differences between the two varieties of the same disease.  
+Depending on whether the data scientist is interested in understanding **Type 1 or Type 2 Diabetes**, the dataset could be more detailed and contain whether a patient has Type 1 Diabetes or Type 2 Diabetes, which our dataset did not signify. This could be extremely important in determining factors that may be significant for one type of diabetes but not the other; it can allow the data scientists to **conclude similarities and differences between the two varieties of the same disease.**  
 
 ## Approach 2
-The dataset could contain a wider selection of individuals in terms of age and gender. The age of a patient is extremely important because there are trends where individuals who have Type 1 Diabetes tend to have their illness peaks at the ages 4-7 and 10-14 in children (Reference 4). Although both types of diabetes can occur at any age, Type 1 Diabetes is especially common in children or young adults since it is a result of the immune system and not a result of dietary choices. Having more analysis that solidifies this concept could be beneficial for doctors and diabetes researchers.
+The dataset could contain a **wider selection** of individuals in terms of **age** and **gender**. The age of a patient is extremely important because there are trends where individuals who have **Type 1 Diabetes** tend to have their **illness peaks** at the ages **4-7** and **10-14** in children (Reference 4). Although both types of diabetes can occur at any age, Type 1 Diabetes is especially common in children or young adults since it is a result of the immune system and not a result of dietary choices. Having more analysis that solidifies this concept could be beneficial for doctors and diabetes researchers.
 
-Similarly, looking at both females and males could be beneficial in determining which factors are more important in making an individual susceptible to diabetes. Because the human physiology is very different between the two sexes, it could be assumed that different variables lead to a diabetes diagnosis in women compared to men. Seeing how this changes with the increase of age could be an interesting research question for future analysis. 
+Similarly, looking at both **females and males** could be beneficial in determining which factors are more important in making an individual susceptible to diabetes. Because the human physiology is very different between the two sexes, it could be assumed that different variables lead to a diabetes diagnosis in women compared to men. Seeing how this changes with the increase of age could be an interesting research question for future analysis. 
 
 ## Approach 3 
-Because our dataset only included patients of Pima Indian heritage, our results are not applicable to other groups of individuals. Therefore, a future study that would be encouraged is analyzing patients who have diverse backgrounds. Not every heritage is known to have genetic and environmental advantages like those of the Pima Indian heritage; therefore, it is critical to repeat this study on a dataset that is more inclusive. 
+Because our dataset only included patients of Pima Native American heritage, our results are not applicable to other groups of individuals. Therefore, a future study that would be encouraged is analyzing patients who have **diverse backgrounds**. Not every heritage is known to have **genetic** and **environmental advantages** like those of the Pima Native American heritage; therefore, it is critical to repeat this study on a dataset that is more **inclusive.** 
 
 
 # References
